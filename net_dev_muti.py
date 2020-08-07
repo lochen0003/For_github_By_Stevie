@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
-# @Time       :  2020/8/4 14:04
+# @Time       :  2020/8/8 02:04
 # @Created by :  Stevie
 
 from netmiko import ConnectHandler, NetmikoTimeoutException, NetmikoAuthenticationException  # 引入连接模块、报错模块
