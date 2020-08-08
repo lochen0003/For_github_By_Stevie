@@ -58,8 +58,12 @@ def my_ssh_mod(dev_type_mod, dev_host_ip_mod, dev_username_mod, dev_password_mod
                 else:
                     print(str(net_dev_host['host']) + ' --- 非模块化设备无需检查.')
                 # 获取设备show run
-                dev_config = net_connect.send_command('show run')
-                print(str(net_dev_host['host']) + ' --- 配置获取完成.')
+                if dev_type_mod == 'huawei':
+                    dev_config = net_connect.send_command('dis curr')
+                    print(str(net_dev_host['host']) + ' --- 配置获取完成.')
+                else:
+                    dev_config = net_connect.send_command('show run')
+                    print(str(net_dev_host['host']) + ' --- 配置获取完成.')
                 net_connect.disconnect()
                 print(str(net_dev_host['host']) + ' --- SSH连接断开.')
                 file_mod(net_dev_host['host'], net_dev_host['host'], dev_config)
