@@ -17,11 +17,11 @@ def directory_check_mod(local_path_mod, directory_name_mod):
     else:
         print(local_path_mod + '/' + directory_name_mod + '已存在.')
 
-def file_mod(get_file_name, get_ip_info, get_info):
+def file_mod(get_file_name, get_ip_info, get_info, get_path):
     # file_creat = open(config_path +
     # str(get_file_name) + '_config_backup_at_' + time_str + '.txt', 'w', encoding='utf-8-sig')
-    file_creat = open(config_path + str(get_file_name) + '.txt', 'w', encoding='utf-8-sig')
-    file_creat.write('dev_ip: ' + get_ip_info + '_config_backup_at_' + time_str + '\n')
+    file_creat = open(get_path + str(get_file_name) + '.txt', 'w', encoding='utf-8-sig')
+    file_creat.write('dev_ip: ' + get_ip_info + ' created_at: ' + time_str + '\n')
     file_creat.write('*' * 85 + '\n')
     file_creat.write(get_info + '\n')
     file_creat.close()
@@ -50,13 +50,16 @@ def my_ssh_mod(dev_type_mod, dev_host_ip_mod, dev_username_mod, dev_password_mod
                 if dev_module_mod == 'module':
                     hw_state = net_connect.send_command('show module')
                     print(str(net_dev_host['host']) + ' --- 模块状态获取完成.')
-                    dev_info_result.append([net_dev_host['host'], hw_state])
+                    file_mod(net_dev_host['host'], net_dev_host['host'], hw_state, module_path)
+                    # dev_info_result.append([net_dev_host['host'], hw_state])
                 elif dev_module_mod == 'platform':
                     hw_state = net_connect.send_command('show platform')
                     print(str(net_dev_host['host']) + ' --- 模块状态获取完成.')
-                    dev_info_result.append([net_dev_host['host'], hw_state])
+                    file_mod(net_dev_host['host'], net_dev_host['host'], hw_state, module_path)
+                    # dev_info_result.append([net_dev_host['host'], hw_state])
                 else:
                     print(str(net_dev_host['host']) + ' --- 非模块化设备无需检查.')
+                print(str(net_dev_host['host']) + ' --- 模块状态记录完成.')
                 # 获取设备show run
                 if dev_type_mod == 'huawei':
                     dev_config = net_connect.send_command('dis curr')
@@ -66,7 +69,11 @@ def my_ssh_mod(dev_type_mod, dev_host_ip_mod, dev_username_mod, dev_password_mod
                     print(str(net_dev_host['host']) + ' --- 配置获取完成.')
                 net_connect.disconnect()
                 print(str(net_dev_host['host']) + ' --- SSH连接断开.')
-                file_mod(net_dev_host['host'], net_dev_host['host'], dev_config)
+
+                file_mod(net_dev_host['host'], net_dev_host['host'], dev_config, config_path)
+
+                # print("当前线程数: " + str(threading.active_count()))
+
                 print(str(net_dev_host['host']) + ' --- 配置文件备份完成.')
             except NetmikoTimeoutException as error_info_1:
                 print(str(error_info_1))
@@ -100,8 +107,9 @@ xls_worksheet = xls_name["Sheet1"]
 xls_name.active = xls_worksheet
 # net_dev_list_info = []
 threads = []
-th_limit = threading.Semaphore(10)
-dev_info_result = []
+th_limit = threading.Semaphore(10)  # 线程数
+
+# dev_info_result = []
 
 for vaule in xls_worksheet.iter_rows(min_row=2, max_col=6, values_only=True):
     info_from_xls = list(vaule)
@@ -123,13 +131,13 @@ for i in threads:
     i.join()
     # result.append(th_queue.dev_info_result)
 
-r2file = open(module_path + 'dev_module.txt', 'w', encoding='utf-8-sig')
-for info in dev_info_result:
-    r2file.write(info[0] + '\n')
-    r2file.write('*' * 85 + '\n')
-    r2file.write(info[1] + '\n')
-    r2file.write('*' * 85 + '\n')
-r2file.close()
+# r2file = open(module_path + 'dev_module.txt', 'w', encoding='utf-8-sig')
+# for info in dev_info_result:
+#     r2file.write(info[0] + '\n')
+#     r2file.write('*' * 85 + '\n')
+#     r2file.write(info[1] + '\n')
+#     r2file.write('*' * 85 + '\n')
+# r2file.close()
 
 timestamp_end = int(time.time())
 timeuse = (timestamp_end - timestamp_start)
