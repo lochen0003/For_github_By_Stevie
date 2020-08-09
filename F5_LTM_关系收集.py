@@ -2,6 +2,7 @@
 # -*- coding: UTF-8 -*-
 # @Created on :  2020/8/9
 # @Created by :  Stevie
+#安装f5-sdk
 
 from f5.bigip import ManagementRoot
 
