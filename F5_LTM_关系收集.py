@@ -13,7 +13,8 @@ vs_pool_node_link_list_0 = []
 vs_pool_node_link_list = []
 
 # 连接
-mgmt = ManagementRoot("168.10.80.172", "admin", "YBwonders2008")
+mgmt = ManagementRoot("1.1.1.1", "admin", "admin123")
+# "ip" "web_username" "web_password"
 
 pools = mgmt.tm.ltm.pools.get_collection()
 for pool in pools:
