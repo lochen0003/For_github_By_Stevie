@@ -5,6 +5,7 @@
 #安装f5-sdk
 
 from f5.bigip import ManagementRoot
+from openpyxl import Workbook
 
 pool_node_link_list_0 = []
 pool_node_link_list = []
@@ -13,9 +14,11 @@ vs_pool_link_list = []
 vs_pool_node_link_list_0 = []
 vs_pool_node_link_list = []
 
+wb = Workbook()
+dest_file = 'f5.xlsx'  # xls 文件名
+
 # 连接
-mgmt = ManagementRoot("1.1.1.1", "admin", "admin123")
-# "ip" "web_username" "web_password"
+mgmt = ManagementRoot("1.1.1.1", "web_admin", "web_passwd")
 
 pools = mgmt.tm.ltm.pools.get_collection()
 for pool in pools:
@@ -52,19 +55,30 @@ for x in vs_pool_link_list:
         else:
             pass
 
-f5_info_file = open('f5_info_file.txt', 'w', encoding='utf-8-sig')
+list_len = len(vs_pool_node_link_list)
+ws1 = wb.active
+ws1.title = 'F5_VS_Link_Info'
+xls_head = ['VS名称', 'VS_IP地址', '关联Pool名称', '后端IP地址']
+ws_row = 2
+
+for col in range(1, 5):
+    ws1.cell(column=col, row=1, value=xls_head[col-1])
+
 for info in vs_pool_node_link_list:
-    f5_info_file.write('VS名称: ' + info[0] + ' VS_IP地址: ' + info[1] +
-                       ' 关联Pool名称: ' + info[2] + ' 后端IP地址: ' + info[3] + '\n')
+    ws1.cell(column=1, row=ws_row, value=info[0])
+    ws1.cell(column=2, row=ws_row, value=info[1])
+    ws1.cell(column=3, row=ws_row, value=info[2])
+    ws1.cell(column=4, row=ws_row, value=info[3])
+    ws_row = ws_row + 1
     print(info)
-f5_info_file.close()
+
+ws1.column_dimensions['A'].width = 30.0
+ws1.column_dimensions['B'].width = 25.0
+ws1.column_dimensions['C'].width = 35.0
+ws1.column_dimensions['D'].width = 25.0
+
+wb.save(filename=dest_file)
+
 print(':) Py by Stevie_Chen...')
 
-# print(vs_pool_node_link_list)
-
-# # pool name
-# for i in pool_node_link_list:
-#     print(i[0])
-# # node name
-# for i in pool_node_link_list:
-#     print(i[1])
+# 待更新vs类型、'i_rules' 关联关系
